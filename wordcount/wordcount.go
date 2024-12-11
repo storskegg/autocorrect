@@ -2,6 +2,7 @@ package wordcount
 
 import (
     "bufio"
+    "io"
     "os"
     "path/filepath"
     "runtime"
@@ -28,22 +29,16 @@ type wordCount struct {
     words      map[string]int
 }
 
-func NewWordCount() WordCount {
+func New() WordCount {
     return &wordCount{
         words: make(map[string]int),
     }
 }
 
-func NewWordCountFromDictionary(path string) (WordCount, error) {
-    wc := NewWordCount()
+func NewFromReader(r io.Reader) (WordCount, error) {
+    wc := New()
 
-    pathAbs, err := filepath.Abs(path)
-    if err != nil {
-        return nil, err
-    }
-
-    f, err := os.Open(pathAbs)
-    scanner := bufio.NewScanner(f)
+    scanner := bufio.NewScanner(r)
     scanner.Split(bufio.ScanWords)
 
     for scanner.Scan() {
@@ -59,6 +54,20 @@ func NewWordCountFromDictionary(path string) (WordCount, error) {
     }
 
     return wc, nil
+}
+
+func NewWordCountFromDictionary(path string) (WordCount, error) {
+    pathAbs, err := filepath.Abs(path)
+    if err != nil {
+        return nil, err
+    }
+
+    f, err := os.Open(pathAbs)
+    if err != nil {
+        return nil, err
+    }
+
+    return NewFromReader(f)
 }
 func (wc *wordCount) Add(word string) {
     wc.Lock()
