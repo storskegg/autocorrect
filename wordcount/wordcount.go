@@ -1,4 +1,4 @@
-package autocorrect
+package wordcount
 
 import (
     "bufio"

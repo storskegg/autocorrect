@@ -1,11 +1,11 @@
-package autocorrect
+package wordcount
 
 import (
     "testing"
 )
 
 const (
-    testDictionary = "./words_alpha.txt"
+    testDictionary = "../words_alpha.txt"
 )
 
 func Test_wordCount_MeanWordLength(t *testing.T) {
