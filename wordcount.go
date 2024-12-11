@@ -18,6 +18,7 @@ type WordCount interface {
     Length() int
     MeanWordLength() int
     Reset()
+    Has(string) bool
 }
 
 type wordCount struct {
@@ -46,7 +47,10 @@ func NewWordCountFromDictionary(path string) (WordCount, error) {
     scanner.Split(bufio.ScanWords)
 
     for scanner.Scan() {
-        word := scanner.Text()
+        word := strings.TrimSpace(scanner.Text())
+        if word == "" {
+            continue
+        }
         wc.Add(word)
     }
 
@@ -104,4 +108,11 @@ func (wc *wordCount) Reset() {
 
     wc.words = make(map[string]int)
     runtime.GC() // Not normally done, but in this case let the runtime know it's time.
+}
+
+func (wc *wordCount) Has(word string) bool {
+    wc.RLock()
+    defer wc.RUnlock()
+
+    return wc.words[strings.ToLower(word)] > 0
 }
